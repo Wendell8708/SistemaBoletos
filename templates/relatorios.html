@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Relatórios</h2>
+
+<h4>Resumo Financeiro</h4>
+<canvas id="chartResumo" width="400" height="200"></canvas>
+
+<script>
+fetch('/relatorios/financeiro/resumo')
+.then(res => res.json())
+.then(data => {
+    const ctx = document.getElementById('chartResumo').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Boletos Pendentes', 'Boletos Pagos', 'Orçamentos Abertos', 'Notas Emitidas'],
+            datasets: [{
+                label: 'Valores (R$)',
+                data: [data.boletos.pendentes, data.boletos.pagos, data.orcamentos_abertos, data.notas_emitidas],
+                backgroundColor: ['#f39c12','#27ae60','#2980b9','#8e44ad']
+            }]
+        },
+        options: { responsive: true }
+    });
+});
+</script>
+{% endblock %}

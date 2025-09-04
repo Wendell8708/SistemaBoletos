@@ -7,7 +7,7 @@ def get_db_connection():
         connection = mysql.connector.connect(
             host="localhost",  # Endereço do servidor MySQL
             user="root",  # Seu usuário do MySQL
-            password="root",  # Sua senha do MySQL
+            password="Ne@123456789",  # Sua senha do MySQL
             database="sistema_boletos"  # Nome do banco de dados
         )
 

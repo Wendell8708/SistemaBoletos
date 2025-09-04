@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Fornecedores</h2>
+
+<form id="formFornecedor" class="mb-4">
+    <input type="text" id="nome" placeholder="Nome" required class="form-control mb-2">
+    <input type="text" id="cnpj" placeholder="CNPJ" required class="form-control mb-2">
+    <input type="text" id="contato" placeholder="Contato" class="form-control mb-2">
+    <button type="submit" class="btn btn-primary">Adicionar</button>
+</form>
+
+<table class="table table-striped" id="tabelaFornecedores">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CNPJ</th>
+            <th>Contato</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+const form = document.getElementById('formFornecedor');
+const tabela = document.querySelector('#tabelaFornecedores tbody');
+
+function listarFornecedores(){
+    fetch('/fornecedores/')
+    .then(res => res.json())
+    .then(data => {
+        tabela.innerHTML = '';
+        data.forEach(f => {
+            tabela.innerHTML += `<tr>
+                <td>${f.id}</td>
+                <td>${f.nome}</td>
+                <td>${f.cnpj}</td>
+                <td>${f.contato}</td>
+                <td>
+                    <button onclick="deletar(${f.id})" class="btn btn-danger btn-sm">Deletar</button>
+                </td>
+            </tr>`;
+        });
+    });
+}
+
+function deletar(id){
+    fetch(`/fornecedores/${id}`, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(() => listarFornecedores());
+}
+
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    const fornecedor = {
+        nome: document.getElementById('nome').value,
+        cnpj: document.getElementById('cnpj').value,
+        contato: document.getElementById('contato').value
+    };
+    fetch('/fornecedores/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(fornecedor)
+    }).then(() => {
+        form.reset();
+        listarFornecedores();
+    });
+});
+
+listarFornecedores();
+</script>
+{% endblock %}

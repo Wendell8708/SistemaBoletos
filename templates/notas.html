@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Notas Fiscais</h2>
+
+<form id="formNota" class="mb-4">
+    <input type="text" id="cliente" placeholder="Cliente" required class="form-control mb-2">
+    <textarea id="descricao" placeholder="Descrição" class="form-control mb-2"></textarea>
+    <input type="number" step="0.01" id="valor_total" placeholder="Valor Total" required class="form-control mb-2">
+    <select id="status" class="form-select mb-2">
+        <option value="emitida">Emitida</option>
+        <option value="cancelada">Cancelada</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Adicionar</button>
+</form>
+
+<table class="table table-striped" id="tabelaNotas">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Descrição</th>
+            <th>Valor Total</th>
+            <th>Data Emissão</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+const formN = document.getElementById('formNota');
+const tabelaN = document.querySelector('#tabelaNotas tbody');
+
+function listarNotas(){
+    fetch('/notas/')
+    .then(res => res.json())
+    .then(data => {
+        tabelaN.innerHTML = '';
+        data.forEach(n => {
+            tabelaN.innerHTML += `<tr>
+                <td>${n.id}</td>
+                <td>${n.cliente}</td>
+                <td>${n.descricao}</td>
+                <td>${n.valor_total}</td>
+                <td>${new Date(n.data_emissao).toLocaleDateString()}</td>
+                <td>${n.status}</td>
+                <td>
+                    <button onclick="deletar(${n.id})" class="btn btn-danger btn-sm">Deletar</button>
+                </td>
+            </tr>`;
+        });
+    });
+}
+
+function deletar(id){
+    fetch(`/notas/${id}`, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(() => listarNotas());
+}
+
+formN.addEventListener('submit', e => {
+    e.preventDefault();
+    const nota = {
+        cliente: document.getElementById('cliente').value,
+        descricao: document.getElementById('descricao').value,
+        valor_total: document.getElementById('valor_total').value,
+        status: document.getElementById('status').value
+    };
+    fetch('/notas/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(nota)
+    }).then(() => {
+        formN.reset();
+        listarNotas();
+    });
+});
+
+listarNotas();
+</script>
+{% endblock %}
